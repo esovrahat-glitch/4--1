@@ -2,236 +2,361 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4 «Е» Экосистема</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>📱 КлассГрамм & 🌐 Наш Сайт • 5 Класс!</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ПЕРЕМЕННЫЕ ТЕМ (Светлая по умолчанию) */
-        :root { --bg: #f2f2f7; --card-bg: #ffffff; --text: #1c1c1e; --border: #ddd; --tab-bg: #ffffff; }
-        /* ТЁМНАЯ ТЕМА */
-        body.dark-mode { --bg: #000000; --card-bg: #1c1c1e; --text: #ffffff; --border: #333; --tab-bg: #1c1c1e; }
-
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; transition: 0.3s; }
-        .hidden { display: none !important; }
-        .card { background: var(--card-bg); padding: 20px; border-radius: 20px; margin: 15px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:'Segoe UI',Roboto,sans-serif;
+            background:linear-gradient(135deg,#111827,#312e81);
+            min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;
+        }
+        .main-container{
+            background:#fff;border-radius:32px;width:100%;max-width:1200px;overflow:hidden;box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .hidden{display:none !important}
         
-        .diary-link { background: #5856d6; color: white; display: block; text-align: center; padding: 15px; border-radius: 15px; text-decoration: none; font-weight: bold; margin-bottom: 20px; }
+        /* 🏠 ГЛАВНЫЙ ЭКРАН ВЫБОРА */
+        .welcome-screen{max-width:500px;padding:40px 32px;text-align:center;margin:0 auto;background:#fff;border-radius:32px;}
+        .main-logo{
+            font-size:42px;font-weight:bold;
+            background:linear-gradient(135deg,#6366f1,#a855f7);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            margin-bottom:8px;
+        }
+        .subtitle{color:#64748b;font-size:16px;margin-bottom:32px}
+        .choice-btn{
+            width:100%;padding:20px;margin-bottom:16px;border:none;border-radius:20px;
+            font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;
+            transition: transform 0.2s;
+        }
+        .choice-btn:active{transform: scale(0.98)}
+        .btn-to-site{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white}
+        .btn-to-app{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white}
         
-        /* 3 ВКЛАДКИ ВНИЗУ */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--tab-bg); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); }
-        .tab-item { text-align: center; color: #8e8e93; text-decoration: none; font-size: 11px; flex: 1; }
-        .tab-item.active { color: #007aff; }
-        .tab-item i { font-size: 24px; display: block; margin-bottom: 3px; }
-
-        input, textarea, select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 12px; margin: 10px 0; box-sizing: border-box; }
-        .btn { background: #007aff; color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; }
+        /* 🌐 ЭКРАН ШКОЛЬНОГО САЙТА */
+        .site-screen{padding:32px;max-width:800px;margin:0 auto}
+        .site-header{text-align:center;margin-bottom:24px}
+        .class-photo-placeholder{
+            width:100%;height:250px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);
+            border-radius:24px;display:flex;align-items:center;justify-content:center;color:#64748b;
+            font-size:18px;margin-bottom:24px;border:3px dashed #94a3b8;
+        }
+        .back-btn{
+            padding:10px 20px;background:#f1f5f9;border:none;border-radius:14px;
+            cursor:pointer;font-weight:600;color:#475569;margin-bottom:20px;
+        }
         
-        /* Кнопки переключения чата */
-        .chat-tabs { display: flex; gap: 10px; margin-bottom: 10px; }
-        .chat-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; background: var(--bg); color: var(--text); }
-        .chat-btn.active { background: #007aff; color: white; }
-
-        .theme-btn { background: #007aff; color: white; border: none; padding: 15px 25px; border-radius: 50px; font-weight: bold; margin-top: 20px; transition: 0.2s; }
-        .theme-btn:active { transform: scale(1.1); }
+        /* 🔒 ЭКРАН ВХОДА В СОЦСЕТЬ */
+        .login-screen{max-width:400px;padding:32px;text-align:center;margin:0 auto}
+        .input-field{
+            width:100%;padding:16px;border:2px solid #e2e8f0;border-radius:18px;
+            font-size:16px;background:#f8fafc;margin-bottom:16px;
+        }
+        .login-btn{
+            width:100%;padding:16px;background:linear-gradient(135deg,#4f46e5,#7c3aed);
+            border:none;color:#fff;border-radius:18px;font-weight:bold;font-size:18px;cursor:pointer;
+        }
+        
+        /* 📱 ВНУТРИ СОЦСЕТИ */
+        .top-bar{
+            display:flex;align-items:center;justify-content:space-between;padding:16px 24px;
+            border-bottom:1px solid #e2e8f0;background:#fff;
+        }
+        .coins-badge{
+            background:linear-gradient(135deg,#fbbf24,#f59e0b);
+            padding:8px 16px;border-radius:40px;font-weight:bold;color:#fff;
+        }
+        .top-menu{
+            display:flex;justify-content:space-around;padding:12px 16px;
+            border-bottom:1px solid #e2e8f0;background:#fff;overflow-x:auto;
+        }
+        .menu-item{
+            padding:10px 16px;border-radius:20px;color:#475569;font-weight:500;
+            cursor:pointer;white-space:nowrap;
+        }
+        .menu-item.active{background:#4f46e5;color:#fff}
+        .content-area{padding:24px;min-height:400px;max-height:500px;overflow-y:auto}
+        .chat-section{border-top:1px solid #e2e8f0;padding:16px 24px;background:#fff}
+        .chat-header{font-weight:bold;margin-bottom:12px}
+        .chat-tabs{display:flex;gap:8px;margin-bottom:12px}
+        .chat-tab{flex:1;padding:8px;text-align:center;background:#f1f5f9;border-radius:12px;cursor:pointer;font-size:14px}
+        .chat-tab.active{background:#4f46e5;color:#fff}
+        .chat-messages{height:150px;overflow-y:auto;margin-bottom:12px;padding:8px;background:#f8fafc;border-radius:16px}
+        .message{background:#fff;padding:10px;border-radius:12px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+        .chat-input-area{display:flex;gap:8px}
+        .chat-input{flex:1;padding:12px;border:1px solid #e2e8f0;border-radius:16px}
+        .send-btn{padding:12px 20px;background:#4f46e5;border:none;color:#fff;border-radius:16px;cursor:pointer}
+        .card{background:#f8fafc;border-radius:24px;padding:20px;margin-bottom:20px}
+        .btn{padding:10px 18px;border-radius:14px;border:none;cursor:pointer;font-weight:500;background:#e2e8f0;margin-right:8px;margin-top:8px}
+        .btn-primary{background:#4f46e5;color:#fff}
+        .post{background:#fff;border-radius:20px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+        .shop-item{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+        .leaderboard-item{display:flex;justify-content:space-between;padding:12px;background:#fff;border-radius:12px;margin-bottom:8px}
+        .admin-badge{background:#f59e0b;color:#fff;padding:4px 10px;border-radius:20px;font-size:12px;margin-left:8px}
+        .agent-badge{background:#111827;color:#38bdf8;padding:4px 10px;border-radius:20px;font-size:12px;margin-left:8px;border:1px solid #0284c7}
+        .welcome-banner{background: linear-gradient(135deg, #6366f1, #a855f7);color: white; padding: 24px; border-radius: 24px; text-align: center; margin-bottom: 20px}
     </style>
 </head>
 <body>
 
-<div id="authPage" class="card" style="margin-top: 100px; text-align: center;">
-    <h2>🔒 Вход в систему</h2>
-    <input id="uName" placeholder="Имя">
-    <input id="uPass" type="password" placeholder="Пароль">
-    <button class="btn" onclick="login()">Войти</button>
-</div>
+<div class="main-container">
+    
+    <div class="welcome-screen" id="welcomePage">
+        <div class="main-logo">🌍 Наша Экосистема</div>
+        <div class="subtitle"><i class="fas fa-graduation-cap"></i> Школа №53 • 5 «Е» Класс</div>
+        
+        <button class="choice-btn btn-to-site" id="goSiteBtn">
+            <i class="fas fa-globe"></i> Открыть наш Сайт
+        </button>
+        <button class="choice-btn btn-to-app" id="goAppBtn">
+            <i class="fas fa-comments"></i> Войти в КлассГрамм
+        </button>
+    </div>
 
-<div id="app" class="hidden">
-    <div id="tab-home" class="page">
-        <div class="card">
-            <a href="https://kundelik.kz" class="diary-link"><i class="fa-solid fa-house"></i> Электронный дневник</a>
-            <h3>📅 Расписание</h3>
-            <div id="schList">Загрузка...</div>
+    <div class="site-screen hidden" id="classSitePage">
+        <button class="back-btn" id="backFromSiteBtn"><i class="fas fa-arrow-left"></i> Назад на главную</button>
+        <div class="site-header">
+            <h1 style="color:#1e3a8a;margin-bottom:8px">✨ Официальный сайт 5 «Е» класса</h1>
+            <p style="color:#64748b">Добро пожаловать на информационную страницу нашего дружного класса!</p>
         </div>
+        
+        <div class="class-photo-placeholder">
+            <p><i class="fas fa-camera"></i> Место для фотографии нашего любимого 5 класса!</p>
+        </div>
+        
         <div class="card">
-            <h3>📚 ГДЗ (Уроки)</h3>
-            <div id="gdzList">Ответов пока нет.</div>
+            <h3><i class="fas fa-bullhorn" style="color:#3b82f6"></i> Новости нашего класса</h3>
+            <p style="margin-top:10px;color:#475569">🔥 Мы официально перешли в 5-й класс! Ура! Мы стали средним звеном. Впереди нас ждут новые кабинеты, много интересных учителей и новые предметы!</p>
+        </div>
+        
+        <div class="card">
+            <h3><i class="fas fa-star" style="color:#fbbf24"></i> Наши достижения</h3>
+            <p style="margin-top:10px;color:#475569">🥇 Наш класс самый дружный, активный и технологичный, ведь у нас есть своя собственная социальная сеть!</p>
         </div>
     </div>
 
-    <div id="tab-chat" class="page hidden">
-        <div class="card">
-            <div class="chat-tabs">
-                <button id="btnGroup" class="chat-btn active" onclick="setChatMode('all')">Общая группа</button>
-                <button id="btnDM" class="chat-btn" onclick="setChatMode('dm')">Написать в Личку</button>
+    <div class="login-screen hidden" id="loginScreen">
+        <button class="back-btn" id="backFromLoginBtn" style="float:left"><i class="fas fa-arrow-left"></i> Назад</button>
+        <div style="clear:both"></div>
+        <div class="logo" style="margin-top:16px">📱 КлассГрамм</div>
+        <div style="margin-bottom:24px;color:#64748b"><i class="fas fa-lock"></i> Вход для учеников 5 «Е»</div>
+        <input type="text" class="input-field" id="userName" placeholder="Твоё имя">
+        <input type="password" class="input-field" id="accessCode" placeholder="Секретный пароль">
+        <div id="loginError" style="color:red;margin-bottom:12px"></div>
+        <button class="login-btn" id="loginButton"><i class="fas fa-sign-in-alt"></i> Авторизоваться</button>
+    </div>
+
+    <div class="main-app hidden" id="mainApp">
+        <div class="top-bar">
+            <h2 style="background:linear-gradient(135deg,#4f46e5,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent">📱 КлассГрамм 5.0</h2>
+            <div style="display:flex;gap:12px;align-items:center">
+                <div class="coins-badge"><i class="fas fa-coins"></i> <span id="coinsAmount">0</span></div>
+                <span id="displayName"></span>
+                <span id="adminBadge" class="admin-badge hidden"></span>
+                <span id="agentBadge" class="agent-badge hidden">🕶️ Агент 007</span>
+                <button id="logoutButton" style="padding:8px 16px;background:#ef4444;color:#fff;border:none;border-radius:14px"><i class="fas fa-sign-out-alt"></i></button>
             </div>
-            
-            <select id="userList" class="hidden" onchange="renderMessages()">
-                </select>
-
-            <div id="chatBox" style="height:300px; overflow-y:auto; border:1px solid var(--border); padding:10px; border-radius:10px; margin-bottom:10px;"></div>
-            
-            <input id="msg" placeholder="Написать сообщение...">
-            <button class="btn" onclick="send()">Отправить</button>
+        </div>
+        
+        <div class="top-menu">
+            <div class="menu-item active" data-tab="feed"><i class="fas fa-home"></i> Лента</div>
+            <div class="menu-item" data-tab="schedule"><i class="fas fa-calendar"></i> Расписание</div>
+            <div class="menu-item" data-tab="shop"><i class="fas fa-store"></i> Магазин Знаний</div>
+            <div class="menu-item" data-tab="leaderboard"><i class="fas fa-trophy"></i> Топ Лидеров</div>
+            <div class="menu-item" data-tab="profile"><i class="fas fa-user"></i> Профиль</div>
+            <div class="menu-item admin-only hidden" data-tab="admin"><i class="fas fa-crown"></i> Админка</div>
+            <div class="menu-item agent-only hidden" data-tab="agent"><i class="fas fa-user-secret"></i> Штаб 007</div>
+        </div>
+        
+        <div class="content-area" id="contentArea"></div>
+        
+        <div class="chat-section">
+            <div class="chat-header"><i class="fas fa-comments"></i> Чат Среднего Звена</div>
+            <div class="chat-tabs">
+                <div class="chat-tab active" data-chat="group">Общий классный</div>
+                <div class="chat-tab" data-chat="private">Личка</div>
+            </div>
+            <div id="privateRecipientSelector" class="hidden" style="margin-bottom:8px">
+                <select id="recipientSelect" class="input-field" style="padding:8px"></select>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Написать сообщение...">
+                <button class="send-btn" id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
 
-    <div id="tab-profile" class="page hidden">
-        <div class="card" style="text-align: center;">
-            <i class="fa-solid fa-circle-user" style="font-size: 60px; color:#007aff;"></i>
-            <h2 id="myNick">Имя</h2>
-            
-            <button id="themeToggle" class="theme-btn" onclick="toggleTheme()">
-                Сделать Тёмным
-            </button>
-        </div>
-
-        <div id="x7Panel" class="card hidden" style="border-color: #34c759;">
-            <h3 style="color: #34c759;">💎 Настройки X7</h3>
-            <p>Расписание:</p>
-            <textarea id="admSch" placeholder="Урок 1, Урок 2..."></textarea>
-            <button class="btn" style="background:#34c759;" onclick="updateSch()">Обновить расписание</button>
-            <hr style="margin:20px 0; border:0; border-top:1px solid var(--border);">
-            <p>Добавить ГДЗ:</p>
-            <input id="admGSub" placeholder="Предмет">
-            <textarea id="admGRes" placeholder="Решение/Ответ"></textarea>
-            <button class="btn" style="background:#34c759;" onclick="updateGdz()">Опубликовать ГДЗ</button>
-        </div>
-    </div>
-
-    <nav class="tab-bar">
-        <a href="#" class="tab-item active" onclick="showTab('home', this)"><i class="fa-solid fa-house"></i>Домой</a>
-        <a href="#" class="tab-item" onclick="showTab('chat', this)"><i class="fa-solid fa-message"></i>Чат</a>
-        <a href="#" class="tab-item" onclick="showTab('profile', this)"><i class="fa-solid fa-user"></i>Профиль</a>
-    </nav>
 </div>
 
 <script>
-const firebaseConfig = { apiKey: "AIzaSyDw7KtHos2d88AdeK5eTQSqd5TaAMl2uwc", projectId: "e-my-fam" };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+(function(){
+    // Подключение к твоей базе Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyDQJw_xdu37Uh6jx-ehKdgd2FPPBsWN_rI",
+        authDomain: "e-family-465d0.firebaseapp.com",
+        projectId: "e-family-465d0",
+        storageBucket: "e-family-465d0.firebasestorage.app",
+        messagingSenderId: "251073200696",
+        appId: "1:251073200696:web:7687221d4fc20321b11ccd",
+        measurementId: "G-HYM990V9D9"
+    };
 
-let me = "";
-let allMessages = [];
-let chatMode = 'all'; // 'all' или 'dm'
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-const students = ["Умида", "Азия", "Шахсанем", "Шахмир", "Эмир", "Мирас", "Генжеваева_Дилнура", "Самая", "Шахло", "Дидар", "Айсара", "Берик", "Серик", "Мамутова_Дилнура", "Ерасыл", "Асад", "Виктория", "Кошкарова_Дилнура", "Женис", "Барно", "Рашит", "Жасмина", "Темирбаева_Жасмина", "Манас", "Асал", "Алина", "Эла", "Тумирис", "Асемай"];
+    // Полный неизмененный список твоего класса
+    const USERS = {
+        'Ерасыл': { password: 'аминсайта', role: 'admin', display: '👑 Главный Админ' },
+        'Умида': { password: 'Умида1', role: 'student', display: '🎒 5 Класс' },
+        'Азия': { password: 'Азия002', role: 'student', display: '🎒 5 Класс' },
+        'Шахсанем': { password: '1234567ш', role: 'student', display: '🎒 5 Класс' },
+        'Шахмир': { password: '12345678ш', role: 'student', display: '🎒 5 Класс' },
+        'Эмир': { password: '1234567э', role: 'student', display: '🎒 5 Класс' },
+        'Мирас': { password: '1234567м', role: 'student', display: '🎒 5 Класс' },
+        'ГенжебаеваДилнура': { password: '123456гд', role: 'student', display: '🎒 5 Класс' },
+        'Самая': { password: '1234567с', role: 'student', display: '🎒 5 Класс' },
+        'Шахло': { password: '123456789ш', role: 'student', display: '🎒 5 Класс' },
+        'Дидар': { password: '1234567д', role: 'student', display: '🎒 5 Класс' },
+        'Айсара': { password: '1234567а', role: 'student', display: '🎒 5 Класс' },
+        'Берик': { password: '1234567', role: 'student', display: '🎒 5 Класс' },
+        'Серик': { password: '7654321', role: 'student', display: '🎒 5 Класс' },
+        'МамутоваДилнура': { password: '1234567мд', role: 'student', display: '🎒 5 Класс' },
+        'Асад': { password: '12345678a', role: 'student', display: '🎒 5 Класс' },
+        'Виктория': { password: '1234567в', role: 'student', display: '🎒 5 Класс' },
+        'КошкароваДилнура': { password: '1234567кд', role: 'student', display: '🎒 5 Класс' },
+        'Женис': { password: '1234567ж', role: 'student', display: '🎒 5 Класс' },
+        'Барно': { password: '676767', role: 'student', display: '🎒 5 Класс' },
+        'Рашит': { password: '87654321', role: 'student', display: '🎒 5 Класс' },
+        'Жасмина': { password: '7654321жс', role: 'student', display: '🎒 5 Класс' },
+        'Тжасмин': { password: '1234567жт', role: 'student', display: '🎒 5 Класс' },
+        'Манас': { password: 'лдлдлд', role: 'student', display: '🎒 5 Класс' },
+        'Асал': { password: '198989', role: 'student', display: '🎒 5 Класс' },
+        'Алина': { password: '123456789', role: 'student', display: '🎒 5 Класс' },
+        'Элла': { password: '6767677', role: 'student', display: '🎒 5 Класс' },
+        'Тумарис': { password: '0987654321', role: 'agent', display: '🕶️ Агент 007' },
+        'Асемай': { password: '123', role: 'student', display: '🎒 5 Класс' }
+    };
 
-function login() {
-    const n = document.getElementById('uName').value.trim();
-    const p = document.getElementById('uPass').value.trim();
-    if((n === "Ерасыл" && p === "X7") || (n !== "" && p !== "")) {
-        me = n;
-        document.getElementById('authPage').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById('myNick').innerText = me;
-        if(me === "Ерасыл") document.getElementById('x7Panel').classList.remove('hidden');
-        
-        // Заполняем список для лички
-        const sel = document.getElementById('userList');
-        sel.innerHTML = '<option value="">-- Выбери кому написать --</option>';
-        students.forEach(s => { if(s !== me) sel.innerHTML += `<option value="${s}">${s}</option>`; });
-        
-        startSync();
-    } else { alert("Ошибка!"); }
-}
+    let currentUser = null;
+    let userCoins = 0;
+    let currentChatTab = 'group';
+    let allUsers = Object.keys(USERS);
 
-function showTab(id, el) {
-    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-    document.getElementById('tab-' + id).classList.remove('hidden');
-    document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-    el.classList.add('active');
-}
-
-function toggleTheme() {
-    const body = document.body;
-    const btn = document.getElementById('themeToggle');
-    body.classList.toggle('dark-mode');
+    // Элементы навигации
+    const welcomePage = document.getElementById('welcomePage');
+    const classSitePage = document.getElementById('classSitePage');
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
     
-    if(body.classList.contains('dark-mode')) {
-        btn.innerText = "Сделать Светлым";
-        btn.style.background = "#ffffff";
-        btn.style.color = "#000000";
-    } else {
-        btn.innerText = "Сделать Тёмным";
-        btn.style.background = "#007aff";
-        btn.style.color = "#ffffff";
-    }
-}
+    const loginError = document.getElementById('loginError');
+    const displayName = document.getElementById('displayName');
+    const adminBadge = document.getElementById('adminBadge');
+    const agentBadge = document.getElementById('agentBadge');
+    const adminMenuItems = document.querySelectorAll('.admin-only');
+    const agentMenuItems = document.querySelectorAll('.agent-only');
+    const coinsAmount = document.getElementById('coinsAmount');
+    const contentArea = document.getElementById('contentArea');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const recipentSelect = document.getElementById('recipientSelect');
+    const privateSelector = document.getElementById('privateRecipientSelector');
 
-// ЛОГИКА ЧАТА (Группа / Личка)
-function setChatMode(mode) {
-    chatMode = mode;
-    if(mode === 'all') {
-        document.getElementById('btnGroup').classList.add('active');
-        document.getElementById('btnDM').classList.remove('active');
-        document.getElementById('userList').classList.add('hidden');
-    } else {
-        document.getElementById('btnGroup').classList.remove('active');
-        document.getElementById('btnDM').classList.add('active');
-        document.getElementById('userList').classList.remove('hidden');
-    }
-    renderMessages();
-}
+    // Кнопки управления переходами страницы
+    document.getElementById('goSiteBtn').addEventListener('click', () => { welcomePage.classList.add('hidden'); classSitePage.classList.remove('hidden'); });
+    document.getElementById('backFromSiteBtn').addEventListener('click', () => { classSitePage.classList.add('hidden'); welcomePage.classList.remove('hidden'); });
+    document.getElementById('goAppBtn').addEventListener('click', () => { welcomePage.classList.add('hidden'); loginScreen.classList.remove('hidden'); });
+    document.getElementById('backFromLoginBtn').addEventListener('click', () => { loginScreen.classList.add('hidden'); welcomePage.classList.remove('hidden'); });
 
-function renderMessages() {
-    const box = document.getElementById('chatBox');
-    const dmUser = document.getElementById('userList').value;
-    box.innerHTML = "";
-    
-    allMessages.forEach(m => {
-        if(chatMode === 'all' && m.to === 'all') {
-            box.innerHTML += `<div style="margin-bottom:8px;"><b>${m.from}:</b> ${m.msg}</div>`;
-        } 
-        else if (chatMode === 'dm' && dmUser !== "") {
-            // Показываем если сообщение от меня к нему ИЛИ от него ко мне
-            if ((m.from === me && m.to === dmUser) || (m.from === dmUser && m.to === me)) {
-                const color = m.from === me ? "#007aff" : "#ff9500";
-                box.innerHTML += `<div style="margin-bottom:8px;"><b style="color:${color}">${m.from}:</b> ${m.msg}</div>`;
-            }
+    async function login() {
+        const userName = document.getElementById('userName').value.trim();
+        const code = document.getElementById('accessCode').value;
+        if(!userName){loginError.textContent='Введи имя';return}
+        if(!code){loginError.textContent='Введи пароль';return}
+        
+        if(!USERS[userName] || USERS[userName].password !== code) {
+            loginError.textContent = 'Неверное имя или пароль!';
+            return;
         }
-    });
-    box.scrollTop = box.scrollHeight;
-}
 
-function send() {
-    const t = document.getElementById('msg').value;
-    if(!t) return;
-    
-    let target = 'all';
-    if(chatMode === 'dm') {
-        target = document.getElementById('userList').value;
-        if(!target) { alert("Выбери, кому написать!"); return; }
+        const role = USERS[userName].role;
+        const displayRole = USERS[userName].display;
+
+        const fakeEmail = `user_${encodeURIComponent(userName.toLowerCase())}@school53.ru`;
+        try {
+            await auth.signInWithEmailAndPassword(fakeEmail, code + "cloud53secret");
+        } catch(e) {
+            try {
+                await auth.createUserWithEmailAndPassword(fakeEmail, code + "cloud53secret");
+            } catch(err) { loginError.textContent = 'Ошибка сети Google'; return; }
+        }
+
+        currentUser = { name: userName, role, displayRole };
+        displayName.textContent = userName;
+        
+        if(role === 'admin') {
+            adminBadge.classList.remove('hidden');
+            adminBadge.textContent = displayRole;
+            adminMenuItems.forEach(el => el.classList.remove('hidden'));
+        }
+        
+        if(role === 'agent') {
+            agentBadge.classList.remove('hidden');
+            agentMenuItems.forEach(el => el.classList.remove('hidden'));
+        }
+        
+        loginScreen.classList.add('hidden'); mainApp.classList.remove('hidden');
+        
+        await loadUserData();
+        loadFeed();
+        loadChatMessages();
     }
 
-    db.collection("messages").add({ from: me, to: target, msg: t, time: Date.now() });
-    document.getElementById('msg').value = "";
-}
+    async function loadUserData() {
+        const doc = await db.collection("users").doc(currentUser.name).get();
+        if(!doc.exists) {
+            await db.collection("users").doc(currentUser.name).set({ coins: 0 });
+            userCoins = 0;
+        } else {
+            userCoins = doc.data().coins || 0;
+        }
+        coinsAmount.textContent = userCoins;
+    }
 
-function startSync() {
-    db.collection("school").doc("schedule").onSnapshot(doc => {
-        if(doc.exists) document.getElementById('schList').innerHTML = doc.data().list.map((u, i) => `<div><b>${i+1}.</b> ${u}</div>`).join("");
-    });
-    db.collection("gdz").onSnapshot(s => {
-        const out = document.getElementById('gdzList'); out.innerHTML = "";
-        s.forEach(d => { out.innerHTML += `<div style="border-left:3px solid #007aff; padding-left:10px; margin-bottom:10px;"><b>${d.data().sub}:</b><br>${d.data().res}</div>`; });
-    });
-    db.collection("messages").orderBy("time", "asc").onSnapshot(s => {
-        allMessages = [];
-        s.forEach(d => allMessages.push(d.data()));
-        renderMessages();
-    });
-}
+    async function saveCoins(amount) {
+        userCoins = amount;
+        await db.collection("users").doc(currentUser.name).set({ coins: userCoins }, { merge: true });
+        coinsAmount.textContent = userCoins;
+    }
 
-function updateSch() {
-    const v = document.getElementById('admSch').value;
-    if(v) db.collection("school").doc("schedule").set({ list: v.split(",") }).then(()=>alert("Готово!"));
-}
-function updateGdz() {
-    const s = document.getElementById('admGSub').value;
-    const r = document.getElementById('admGRes').value;
-    if(s && r) db.collection("gdz").add({ sub: s, res: r, time: Date.now() }).then(()=>alert("Готово!"));
-}
-</script>
-</body>
-</html>
+    function loadFeed() {
+        db.collection("posts").orderBy("time", "desc").onSnapshot(snapshot => {
+            let html = `
+                <div class="welcome-banner">
+                    <h2>🎉 С переходом в 5-й КЛАСС! 🎉</h2>
+                    <p>Привет, среднее звено! Выкладывайте посты, общайтесь и копите монеты!</p>
+                </div>
+                <div class="card">
+                    <textarea id="postContent" class="input-field" placeholder="Что нового в 5 классе? +5 🪙"></textarea>
+                    <button class="btn btn-primary" id="createPostBtn"><i class="fas fa-plus"></i> Опубликовать (+5 🪙)</button>
+                </div>`;
+            snapshot.forEach(doc => {
+                const p = doc.data();
+                html += `<div class="post"><b>${p.user_name}</b><p>${p.content}</p></div>`;
+            });
+            contentArea.innerHTML = html;
+
+            document.getElementById('createPostBtn')?.addEventListener('click', async () => {
+                const content = document.getElementById('postContent').value.trim();
+                if(!content) return alert('Напиши что-нибудь!');
+                await db.collection("posts").add({ user_name: currentUser.name, content, time: Date.now() });
+                await saveCoins(userCoins + 5);
+        
